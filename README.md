@@ -40,16 +40,18 @@ Three ways, pick one:
 
 **Option A — One-line download (fastest):**
 ```bash
-mkdir -p ~/.claude/skills/gan && curl -o ~/.claude/skills/gan/SKILL.md https://raw.githubusercontent.com/GAN-Thinking/gan-skill/main/.claude/skills/gan/SKILL.md
+mkdir -p ~/.claude/skills/gan && curl -o ~/.claude/skills/gan/SKILL.md https://raw.githubusercontent.com/GAN-Thinking/gan-skill/main/SKILL.md
 ```
 
-**Option B — Clone the repo (if you want updates via git pull):**
+**Option B — Clone and copy:**
 ```bash
-git clone https://github.com/GAN-Thinking/gan-skill.git ~/.claude/skills/gan
+git clone https://github.com/GAN-Thinking/gan-skill.git /tmp/gan-skill
+mkdir -p ~/.claude/skills/gan
+cp /tmp/gan-skill/SKILL.md ~/.claude/skills/gan/SKILL.md
 ```
 
-**Option C — Manual copy:**
-1. Download [`SKILL.md`](.claude/skills/gan/SKILL.md) from this repo
+**Option C — Manual download:**
+1. Download [`SKILL.md`](SKILL.md) from this repo
 2. Put it in `~/.claude/skills/gan/SKILL.md`
 
 Then in Claude Code, just type:
@@ -88,4 +90,4 @@ One is an analysis tool. The other is a creation tool.
 
 ## License
 
-MIT
+[MIT](LICENSE)
