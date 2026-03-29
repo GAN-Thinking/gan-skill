@@ -19,6 +19,7 @@ Parse `$ARGUMENTS` by scanning for these **optional, order-independent** tokens:
 - **Consecutive same-role is allowed.** If forced to the same role twice, you MUST attack/defend from a NEW angle. No repeating prior arguments.
 
 ### Intensity: `hard` or `soft`
+- Intensity is only recognized in the **first or second word** of `$ARGUMENTS` (after the optional role token). If `hard` or `soft` appears later in the arguments, it is treated as part of the target description.
 - `hard` → Destruction Mode (see below).
 - `soft` → Socratic Mode (see below).
 - If not specified → default Steel Man + Black Hat mode.
