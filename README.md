@@ -2,6 +2,8 @@
 
 A Claude Code skill. Two AI roles fight each other so your ideas get stronger.
 
+Dead simple to use. Just type `/gan` after any idea — the quality of thinking you get back is dramatically better than asking AI to "give me pros and cons."
+
 ## See it in action
 
 **You type:**
@@ -32,14 +34,25 @@ I want to build a marketplace for AI agents to trade services
 
 **Each round gets sharper.** Discriminator can't repeat old attacks. Generator must evolve, not just defend.
 
-## Install (30 seconds)
+## Install
 
+Three ways, pick one:
+
+**Option A — One-line download (fastest):**
 ```bash
-mkdir -p ~/.claude/skills/gan
-curl -o ~/.claude/skills/gan/SKILL.md https://raw.githubusercontent.com/GAN-Thinking/gan-skill/main/.claude/skills/gan/SKILL.md
+mkdir -p ~/.claude/skills/gan && curl -o ~/.claude/skills/gan/SKILL.md https://raw.githubusercontent.com/GAN-Thinking/gan-skill/main/.claude/skills/gan/SKILL.md
 ```
 
-Then in Claude Code:
+**Option B — Clone the repo (if you want updates via git pull):**
+```bash
+git clone https://github.com/GAN-Thinking/gan-skill.git ~/.claude/skills/gan
+```
+
+**Option C — Manual copy:**
+1. Download [`SKILL.md`](.claude/skills/gan/SKILL.md) from this repo
+2. Put it in `~/.claude/skills/gan/SKILL.md`
+
+Then in Claude Code, just type:
 ```
 /gan your idea here
 ```
