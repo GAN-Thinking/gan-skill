@@ -21,9 +21,13 @@ I want to build a marketplace for AI agents to trade services
 > **🗡️ If I Were Your Opponent**
 > I'd skip the marketplace entirely. I'd build an open protocol — like MCP but for agent-to-agent discovery. No platform fees, no cold start. Your marketplace becomes irrelevant on day one.
 
+---
+
 **You reply:** "Good point, but I have existing relationships with 50 AI dev teams"
 
 **You type:** `/gan`
+
+---
 
 **🟢 Generator absorbs the hit and evolves:**
 > **✅ Conceded:** Trust infrastructure is genuinely missing. Fair hit.
@@ -43,11 +47,12 @@ Three ways, pick one:
 mkdir -p ~/.claude/skills/gan && curl -o ~/.claude/skills/gan/SKILL.md https://raw.githubusercontent.com/GAN-Thinking/gan-skill/main/SKILL.md
 ```
 
-**Option B — Clone and copy:**
+**Option B — Clone and copy (for future updates):**
 ```bash
-git clone https://github.com/GAN-Thinking/gan-skill.git /tmp/gan-skill
+git clone https://github.com/GAN-Thinking/gan-skill.git ~/gan-skill
 mkdir -p ~/.claude/skills/gan
-cp /tmp/gan-skill/SKILL.md ~/.claude/skills/gan/SKILL.md
+cp ~/gan-skill/SKILL.md ~/.claude/skills/gan/SKILL.md
+# To update later: cd ~/gan-skill && git pull && cp SKILL.md ~/.claude/skills/gan/SKILL.md
 ```
 
 **Option C — Manual download:**
@@ -87,6 +92,12 @@ GAN Thinking splits AI into two adversaries. Generator goes all-in building the 
 | Output | A list | A battle-tested proposal |
 
 One is an analysis tool. The other is a creation tool.
+
+## Contributing
+
+Found a bug? Have an idea? [Open an issue](https://github.com/GAN-Thinking/gan-skill/issues) or submit a PR.
+
+If you find this useful, a ⭐ helps others discover it.
 
 ## License
 
