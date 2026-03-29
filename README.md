@@ -93,6 +93,18 @@ GAN Thinking splits AI into two adversaries. Generator goes all-in building the 
 
 One is an analysis tool. The other is a creation tool.
 
+## Security
+
+This skill is a **plain text prompt** — nothing more. It does NOT:
+
+- ❌ Execute code or Bash commands
+- ❌ Read or write files on your system
+- ❌ Access the internet
+- ❌ Use `allowed-tools` or request any special permissions
+- ❌ Include hooks or background processes
+
+You can verify this yourself — [`SKILL.md`](SKILL.md) is a single markdown file with zero executable content. What you read is what you get.
+
 ## Contributing
 
 Found a bug? Have an idea? [Open an issue](https://github.com/GAN-Thinking/gan-skill/issues) or submit a PR.
