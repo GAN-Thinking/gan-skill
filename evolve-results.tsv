@@ -1,3 +1,4 @@
 round	flaw	category	severity	old_total	new_total	verdict	reason
 1	Role override g/d parsed anywhere in arguments, not just first position — causes false matches in target text	parsing	4	37	38	KEEP	New version edges ahead on depth and actionability with marginal net improvement
 2	Intensity tokens hard/soft parsed anywhere in arguments — causes false matches in target text like "the hard drive design"	parsing	4	37	40	KEEP	New version names more competitors, adds liability angle, offers sharper actionable advice
+3	Discriminator has no special handling for first-round invocations against raw unformed ideas — applies full 5-section attack prematurely	logic	3	34	37	KEEP	Reconnaissance Mode digs deeper per risk with nuanced reasoning and ends with sharp killer question
