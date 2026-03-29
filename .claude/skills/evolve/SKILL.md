@@ -1,6 +1,6 @@
 ---
 name: evolve
-description: AutoResearch-inspired self-evolution loop for ANY Claude Code skill. Automatically improves a SKILL.md through iterative adversarial pressure + quantified benchmarking. Each round finds a flaw, proposes a fix, tests against a fixed benchmark, and keeps or reverts based on a Judge score. Works on any skill, not just /gan.
+description: AutoResearch-inspired self-evolution loop for ANY Claude Code skill. Finds flaws, fixes them, benchmarks against a diverse prompt pool (anti-overfitting), and uses blind A/B judging. Fully automated — no human input needed during the loop.
 argument-hint: [skill-name or path] [number of rounds]
 allowed-tools: Agent, Read, Write, Edit, Bash, Glob, Grep
 ---
@@ -9,7 +9,7 @@ allowed-tools: Agent, Read, Write, Edit, Bash, Glob, Grep
 
 You are the **Evolution Controller**. Your job is to run an automated improvement loop on **any** Claude Code SKILL.md, inspired by Karpathy's AutoResearch framework.
 
-**Core principle:** One change at a time. Measure before and after. Keep if better, revert if not.
+**Core principle:** One change at a time. Measure before and after. Keep if better, revert if not. Fully automated — no human input during the loop.
 
 ## Step 0: Parse Arguments
 
@@ -32,7 +32,6 @@ Scan `$ARGUMENTS` for:
 /evolve gan 5              → evolve /gan skill, 5 rounds
 /evolve discuss 3          → evolve /discuss skill, 3 rounds
 /evolve ./my-skill/SKILL.md 10  → evolve specific file, 10 rounds
-/evolve overnight          → evolve ./SKILL.md, 20 rounds
 /evolve gan overnight      → evolve /gan skill, 20 rounds
 ```
 
@@ -40,26 +39,39 @@ Scan `$ARGUMENTS` for:
 
 1. Find the SKILL.md file based on the parsed target.
 2. Read its content completely.
-3. **Understand the skill's purpose** by reading its `name`, `description`, and instructions. You need this to:
-   - Generate an appropriate benchmark prompt
-   - Know what "good output" looks like for this specific skill
-4. Also locate or create `evolve-results.tsv` in the working directory for logging.
+3. **Understand the skill's purpose** by reading its `name`, `description`, and instructions.
+4. Locate or create `evolve-results.tsv` in the working directory for logging.
 
-## Step 2: Generate a Benchmark
+## Step 2: Generate Benchmark Pool (Anti-Overfitting)
 
-Since different skills do different things, you MUST generate a **skill-appropriate benchmark prompt** on the first round, then reuse it for all subsequent rounds.
+**CRITICAL: Do NOT use a single benchmark prompt.** A single prompt causes overfitting — the skill gets optimized for one scenario while degrading on others.
 
-**Benchmark generation rules:**
-- Read the skill's description and instructions
-- Create a realistic, specific use case that exercises the skill's core functionality
-- The benchmark must be a **single, fixed prompt** that produces comparable output across versions
-- Write the benchmark to `evolve-benchmark.md` in the working directory so it persists across sessions
+On the first round, generate a **pool of 3 diverse benchmark prompts** that cover different use cases of the skill. Save them to `evolve-benchmark.md`.
 
-**Examples of good benchmarks:**
-- For `/gan`: "Act as Discriminator on: 'I want to build a SaaS that auto-generates API docs from source code'"
-- For `/discuss`: "Run a discussion on: 'Should a solo developer build a mobile app or a web app first?'"
-- For `/review`: "Review this diff: [a realistic small code diff]"
-- For a generic skill: A prompt that covers the skill's primary use case
+**Rules for benchmark pool:**
+- Each prompt must exercise a DIFFERENT aspect of the skill
+- Prompts should vary in: topic domain, complexity, and specificity
+- Each round, **randomly pick 1 prompt from the pool** to benchmark against
+- Over N rounds, different prompts get used, preventing overfitting to any single one
+
+**Example pool for /gan:**
+```
+1. "I want to build a SaaS that auto-generates API documentation from source code"
+   (tech/SaaS — tests market analysis capability)
+
+2. "Should I quit my stable job to become a full-time indie developer? I have 18 months of savings."
+   (life decision — tests non-business, personal advice capability)
+
+3. "Our team is debating whether to rewrite our monolith in microservices"
+   (technical architecture — tests code/engineering critique capability)
+```
+
+**Example pool for /review:**
+```
+1. [A Python function with a subtle off-by-one error]
+2. [A SQL query with a potential injection vulnerability]
+3. [A React component with a performance anti-pattern]
+```
 
 If `evolve-benchmark.md` already exists, read and reuse it (don't regenerate).
 
@@ -69,7 +81,7 @@ For each round:
 
 ### 3a. Read Current State
 
-Read the current SKILL.md content. This is the "current version."
+Read the current SKILL.md content. Save a copy as the "old version" for potential revert.
 
 ### 3b. Find a Flaw (Critic Phase)
 
@@ -109,65 +121,73 @@ Read the Critic's output. If SEVERITY >= 2, apply the fix:
 
 If SEVERITY = 1, skip this round (log as "skipped: too minor") and move to next round.
 
-### 3d. Benchmark — Before & After
+### 3d. Select Benchmark
 
-Run the benchmark prompt through both the old and new versions by launching 2 Agent subagents in parallel:
+**Randomly pick 1 prompt from the benchmark pool** for this round. Use a different one than the last round if possible (rotate through the pool).
+
+### 3e. Benchmark — Before & After
+
+Run the selected benchmark prompt through both old and new versions by launching 2 Agent subagents in parallel:
 
 ```
 You are testing a Claude Code skill called [SKILL_NAME]. Act as if this skill's instructions are your operating guide.
 
 SKILL INSTRUCTIONS:
-[INSERT SKILL.MD CONTENT — OLD or NEW version]
+[INSERT SKILL.MD CONTENT — version A or version B]
 
 Now execute the following task according to the skill's instructions:
-[BENCHMARK PROMPT from evolve-benchmark.md]
+[SELECTED BENCHMARK PROMPT]
 
 Produce your output following the skill's instructions exactly.
 ```
 
-One agent gets the OLD SKILL.md content, the other gets the NEW SKILL.md content.
+**CRITICAL for anti-bias:** Randomly assign which version is "A" and which is "B". Do NOT always put old first. Record the mapping but do not tell the Judge.
 
-### 3e. Judge
+### 3f. Judge (Blind A/B)
 
 Launch 1 Agent subagent as a **Judge**:
 
 ```
-You are a Judge comparing two outputs from a Claude Code skill called [SKILL_NAME] — one from the OLD version, one from the NEW version. Both were given the same benchmark task.
+You are a Judge comparing two outputs from a Claude Code skill called [SKILL_NAME]. Both were given the same task.
 
 The skill's purpose: [SKILL_DESCRIPTION]
 
-OLD VERSION OUTPUT:
-[old output]
+Version A output:
+[output A]
 
-NEW VERSION OUTPUT:
-[new output]
+Version B output:
+[output B]
 
-Score EACH output on these 5 criteria (1-10):
+Step 1 — Instruction compliance:
+Does each version follow the skill's stated output format and rules?
+Version A compliance: PASS / FAIL
+Version B compliance: PASS / FAIL
+If one FAILS and the other PASSES → the PASS version wins. Skip to verdict.
 
-1. SPECIFICITY: Does the output include concrete, specific details rather than vague generalities?
-2. DEPTH: Does it go beyond surface-level and reveal non-obvious insights?
-3. ACTIONABILITY: Does the output give the user clear direction on what to do next?
-4. STRUCTURE: Does it follow the skill's prescribed output format cleanly?
-5. EFFECTIVENESS: Does it achieve the skill's stated purpose well?
+Step 2 — Forced choice:
+You MUST pick one. No ties allowed.
+Which version better achieves the skill's purpose? A or B?
 
 Return EXACTLY this format:
-OLD_SCORES: specificity=X depth=X actionability=X structure=X effectiveness=X total=XX
-NEW_SCORES: specificity=X depth=X actionability=X structure=X effectiveness=X total=XX
-VERDICT: KEEP or REVERT
-REASON: [one sentence explaining why]
+A_COMPLIANCE: PASS or FAIL
+B_COMPLIANCE: PASS or FAIL
+WINNER: A or B
+REASON: [one sentence why]
 ```
 
-### 3f. Keep or Revert
+### 3g. Keep or Revert
 
-- If VERDICT = **KEEP**: The edit stays. Log the improvement.
-- If VERDICT = **REVERT**: Undo the edit (re-write the old SKILL.md content). Log the revert.
+1. Map the Judge's winner (A or B) back to old/new using your recorded mapping.
+2. If a compliance FAIL forced the result, note it.
+3. If **new version wins** → KEEP. The edit stays.
+4. If **old version wins** → REVERT. Re-write the old SKILL.md content.
 
-### 3g. Log Results
+### 3h. Log Results
 
 Append a line to `evolve-results.tsv`:
 
 ```
-round	skill	flaw	category	severity	old_total	new_total	verdict	reason
+round	skill	benchmark	flaw	category	severity	verdict	reason
 ```
 
 If the file doesn't exist, create it with the header row first.
@@ -184,26 +204,29 @@ Kept: X improvements
 Reverted: Y attempts
 Skipped: Z (too minor)
 
-### Score Progression
-Round 1: XX → YY ✅/❌/⏭️ (description)
-Round 2: XX → YY ✅/❌/⏭️ (description)
+Benchmark coverage: [which prompts were used, how many times each]
 
-### Changes Made
-1. [description of kept change 1]
-2. [description of kept change 2]
+### Changes
+Round 1: ✅ KEEP — [flaw] (benchmark: prompt #2)
+Round 2: ❌ REVERT — [flaw] (benchmark: prompt #1)
+Round 3: ⏭️ SKIP — severity 1
 
-### Current Score: XX/50
+### Kept Changes
+1. [description]
+2. [description]
 ```
 
 ## Important Rules
 
-1. **ONE change per round.** Never batch multiple fixes. This isolates what works.
-2. **Same benchmark every time.** Never change the benchmark prompt mid-session. This is the control variable.
-3. **Judge is always a SEPARATE agent.** The agent that made the fix cannot judge its own fix.
-4. **Revert is not failure.** A reverted experiment still taught you something. Log it.
-5. **Never modify this file (evolve SKILL.md).** Only modify the target skill's SKILL.md.
-6. **Git commit after each KEPT change** if the working directory is a git repo. Use message format: `evolve([skill-name]): [description of change]`.
-7. **Track previous flaws.** Pass the list of previously found flaws to the Critic so it doesn't repeat.
+1. **ONE change per round.** Never batch multiple fixes.
+2. **Rotate benchmarks.** Never use the same benchmark prompt twice in a row.
+3. **Blind judging.** Judge never knows which is old vs new. Random A/B assignment.
+4. **No human input during the loop.** Fully automated. Report at the end.
+5. **Judge uses forced choice, not scoring.** No points, no scales. Just "A or B."
+6. **Revert is not failure.** Log it and move on.
+7. **Never modify this file (evolve SKILL.md).** Only modify the target skill's SKILL.md.
+8. **Git commit after each KEPT change** if in a git repo. Format: `evolve([skill-name]): [description]`.
+9. **Track previous flaws.** Pass the list to Critic to avoid repeats.
 
 ## Output Language
 
