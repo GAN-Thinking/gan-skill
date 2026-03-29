@@ -1,0 +1,2 @@
+round	flaw	category	severity	old_total	new_total	verdict	reason
+1	Role override g/d parsed anywhere in arguments, not just first position — causes false matches in target text	parsing	4	37	38	KEEP	New version edges ahead on depth and actionability with marginal net improvement

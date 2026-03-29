@@ -13,7 +13,7 @@ This skill mirrors a Generative Adversarial Network. You alternate between two o
 Parse `$ARGUMENTS` by scanning for these **optional, order-independent** tokens:
 
 ### Role Override: `g` or `d`
-- A standalone `g` or `d` (single letter, separated by spaces) forces the role.
+- Only the **first word** of `$ARGUMENTS` is checked for role override. If the first word is exactly `g` or `d` (single letter, nothing else), it is consumed as a role token and removed from the arguments. Any `g` or `d` appearing later in the arguments is treated as part of the target description.
 - `d` → force Discriminator. `g` → force Generator.
 - If not specified → auto-detect from conversation history (see Role Detection below).
 - **Consecutive same-role is allowed.** If forced to the same role twice, you MUST attack/defend from a NEW angle. No repeating prior arguments.
