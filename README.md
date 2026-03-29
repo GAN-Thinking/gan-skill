@@ -2,6 +2,38 @@
 
 A Claude Code skill that uses GAN (Generative Adversarial Network) concepts to stress-test your ideas. Two AI roles — **Discriminator** (critic) and **Generator** (advocate) — take turns attacking and defending, pushing your thinking through structured adversarial debate.
 
+## How is this different from Pros & Cons?
+
+**In one sentence:** Pros & Cons makes AI a commentator — standing on the sidelines giving opinions. GAN Thinking makes AI both the player and the coach — fighting on the field, reviewing its own performance, then fighting a better round.
+
+This is why GAN Thinking has unique value as a skill — it's not a fancy wrapper around Pros & Cons. The underlying mechanism is fundamentally different.
+
+### How GAN Thinking works internally
+
+AI splits into two distinct roles — Generator and Discriminator. This creates an **iterative adversarial loop**: G produces, D scores, G improves based on feedback, D scores again. The key is that D doesn't just say "good" or "bad" — it provides a **gradient signal** explaining *why* something isn't good enough, giving G a direction to improve.
+
+This means AI is performing multiple rounds of self-correction, and each round has directionality. It's not random retry — it's targeted optimization along the weaknesses D identified.
+
+### How Pros & Cons works internally
+
+AI is asked to list positives and negatives for a proposal simultaneously. This is a **single static evaluation** — stand in front of a plan, look left, look right, list pros and cons, done.
+
+No iteration, no adversarial pressure, no role separation. AI uses the same perspective to see both sides at once.
+
+### The fundamental differences
+
+**1. Time structure.**
+Pros & Cons is a snapshot — one-shot output. GAN Thinking is a time series — with rounds and evolution. The same question after three GAN iterations produces dramatically better answers than a one-shot Pros & Cons analysis, because the GAN version has been pressure-tested.
+
+**2. Cognitive depth.**
+Pros & Cons tends to stay at the surface layer. AI naturally lists obvious pros and cons, then stops. GAN Thinking forces AI to dig into the second and third layers — because D says "G already addressed that issue, give me deeper vulnerabilities," surfacing blind spots that wouldn't otherwise be found.
+
+**3. Purity of stance.**
+Pros & Cons asks AI to think about good and bad using the same brain simultaneously, creating a "self-balancing" tendency — AI unconsciously makes the number of pros and cons roughly equal, the severity roughly matched, giving you an analysis that looks balanced but is actually mediocre. GAN Thinking completely separates the two stances. G goes all-in on making the best case. D goes all-in on finding the most fatal problems. Neither needs to accommodate the other. The tension from this separation is where the real signal comes from.
+
+**4. Nature of the output.**
+Pros & Cons produces a list. GAN Thinking produces a **battle-tested proposal**. The former helps you "see the situation clearly." The latter helps you "produce something better." One is an analysis tool. The other is a creation tool.
+
 ## Quick Start
 
 ```bash
