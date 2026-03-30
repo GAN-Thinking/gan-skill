@@ -1,6 +1,6 @@
 # /gan — Make AI Argue With Itself to Stress-Test Your Ideas
 
-A Claude Code skill. Two AI roles fight each other so your ideas get stronger.
+A Claude Code skill (v1.1.0). Two AI roles fight each other so your ideas get stronger.
 
 Dead simple to use. Just type `/gan` after any idea — the quality of thinking you get back is dramatically better than asking AI to "give me pros and cons."
 
@@ -74,9 +74,16 @@ Then in Claude Code, just type:
 /gan soft                   # Socratic mode — sharp questions instead of statements
 /gan :en                    # English output (also :ja :ko :zh-cn :tw)
 /gan d hard :en this API    # Combine everything
+/gan sum                    # End-of-session summary: what was resolved, what's still open
 ```
 
 All parameters are optional, any order. Your free-text replies between `/gan` calls are automatically absorbed as context.
+
+### After a good debate
+
+When you've run a few rounds and want the takeaway:
+
+`/gan sum` distills all rounds into: resolved attacks, open risks, key concessions, and a final evolved proposal you can act on.
 
 ## How is this different from Pros & Cons?
 
