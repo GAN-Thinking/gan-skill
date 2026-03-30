@@ -1,7 +1,7 @@
 ---
 name: gan
 description: Adversarial dialectic tool inspired by GAN. Alternates between Generator (creative advocate) and Discriminator (adversarial critic). Supports forced role selection (g/d), intensity modes (hard/soft), and multi-language output. Use for stress-testing ideas, business plans, code, and spec designs.
-argument-hint: [g|d] [hard|soft] [:lang] [target description]
+argument-hint: [g|d|sum] [hard|soft] [:lang] [target description]
 ---
 
 # GAN — Adversarial Dialectic Mode
@@ -11,6 +11,10 @@ This skill mirrors a Generative Adversarial Network. You alternate between two o
 ## Argument Parsing (CRITICAL)
 
 Parse `$ARGUMENTS` by scanning for these **optional, order-independent** tokens:
+
+### Conclude Mode: `sum`
+- If the **first word** of `$ARGUMENTS` is exactly `sum`, enter **Conclude Mode** (see below). All other tokens are ignored.
+- This is a special mode that synthesizes the entire conversation's `/gan` rounds into a structured summary.
 
 ### Role Override: `g` or `d`
 - Only the **first word** of `$ARGUMENTS` is checked for role override. If the first word is exactly `g` or `d` (single letter, nothing else), it is consumed as a role token and removed from the arguments. Any `g` or `d` appearing later in the arguments is treated as part of the target description.
@@ -47,6 +51,7 @@ Parse `$ARGUMENTS` by scanning for these **optional, order-independent** tokens:
 /gan :ja                          → auto role + Japanese output
 /gan d hard :en this API design   → force D + hard + English + target
 /gan g :zh-cn                     → force G + Simplified Chinese
+/gan sum                     → synthesize all rounds into structured summary
 ```
 
 ## Role Detection (when no g/d override)
@@ -214,6 +219,50 @@ User's idea (Thesis)
 ```
 
 Each round MUST build on ALL previous rounds. No repeating old arguments. Reference specific points from prior rounds by name.
+
+## Conclude Mode
+
+When `sum` is the first word of `$ARGUMENTS`, do NOT enter D or G role. Instead, synthesize the entire conversation's `/gan` rounds into a structured summary.
+
+Scan the conversation for all previous `/gan` invocations and their outputs, then produce:
+
+### Output Structure
+
+```
+## 🎯 /gan Conclude
+
+### 📋 Topic
+[What was being debated — one sentence]
+
+### 🔄 Rounds Summary
+[How many D/G rounds were played, brief arc of how the debate evolved]
+
+### ✅ Resolved — Attacks That Were Addressed
+- [D's attack] → [G's solution or concession]
+- ...
+
+### ⚠️ Unresolved — Open Risks
+- [Attacks or concerns that were never adequately answered]
+- ...
+
+### 📌 Key Concessions
+- [Points G conceded as valid — these are confirmed weaknesses]
+- ...
+
+### 🔄 Final Evolved Proposal
+[The most mature version of the idea, incorporating all valid critiques and G's evolutions. This should be a standalone description someone could read without the full debate.]
+
+### 🔮 Next Time
+[The single most important unresolved question worth exploring in a future session]
+```
+
+### Conclude Principles
+- **Be faithful to the debate.** Don't invent new arguments. Only summarize what was actually said.
+- **Attribute clearly.** Mark which round each point came from (e.g., "D Round 2", "G Round 3").
+- **The Final Evolved Proposal is the most important section.** It should be actionable and self-contained.
+- **Follow the conversation's output language** (same rules as D/G modes).
+
+---
 
 ## Output Language
 
